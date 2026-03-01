@@ -10,6 +10,8 @@ Shader "Unlit/FirstShader"
         _Green("Greed", Range(0, 1)) = 1
         _Yellow("Yellow", Range(0, 1)) = 1
         _Alpha("Alpha", Range(0, 1)) = 1
+        [Header(Offset)]
+        _Offset("Offset", float) = 0
     }
     SubShader
     {
@@ -39,6 +41,14 @@ Shader "Unlit/FirstShader"
                 float2 uv : TEXCOORD0;
             };
 
+            // 添加自己的struct
+            struct MyAppdata
+            {
+                float4 vertex : POSITION;
+                float3 normal : NORMAL;
+                float2 uv : TEXCOORD0;
+            };
+
             struct v2f
             {
                 float2 uv : TEXCOORD0;
@@ -53,11 +63,14 @@ Shader "Unlit/FirstShader"
             float _Green;
             float _Yellow;
             float _Alpha;
+            float _Offset;
 
-            v2f vert (appdata v)
+            v2f vert (MyAppdata v)
             {
                 v2f o;
-                o.vertex = UnityObjectToClipPos(v.vertex);
+                // o.vertex = UnityObjectToClipPos(v.vertex);
+                // o.vertex = UnityObjectToClipPos(v.vertex + float3(0, 1, 0));
+                o.vertex = UnityObjectToClipPos(v.vertex + float3(0, _Offset, 0));
                 o.uv = TRANSFORM_TEX(v.uv, _MainTex);
                 UNITY_TRANSFER_FOG(o,o.vertex);
                 return o;
@@ -69,6 +82,8 @@ Shader "Unlit/FirstShader"
                 // fixed4 col = tex2D(_MainTex, i.uv);
                 fixed4 col = fixed4(_Red, _Green, _Yellow, _Alpha);
                 col = OnlyRedAlpha(col);
+                // 尝试将颜色与坐标进行联系， 
+                col = col * sin(i.vertex.x);
                 // apply fog
                 UNITY_APPLY_FOG(i.fogCoord, col);
                 // return col;

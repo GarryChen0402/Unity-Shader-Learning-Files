@@ -49,3 +49,42 @@ half4 OnlyRedAlpha(half4 col)
     return half4(col.r, 0, 0, col.a);
 }
 ~~~
+
+## Day 02 认识Shader中的代码
+
+### Shader中的结构体
+
+语法：
+struct 关键词
+类似于 C/C++
+其中的每个变量后都会带有一个 **: 描述字段** 用于描述该字段应当表示什么属性值
+
+### 顶点着色器
+
+就是其中的vert函数， 可以对顶点的一些信息进行修改
+
+例如：
+~~~
+v2f vert (MyAppdata v)
+{
+    v2f o;
+    // o.vertex = UnityObjectToClipPos(v.vertex);
+    // o.vertex = UnityObjectToClipPos(v.vertex + float3(0, 1, 0)); // 并非修改了模型中顶点的位置， 这里的修改仅仅是 改变了物体的贴图显示的位置
+    o.vertex = UnityObjectToClipPos(v.vertex + float3(0, _Offset, 0));
+    o.uv = TRANSFORM_TEX(v.uv, _MainTex);
+    UNITY_TRANSFER_FOG(o,o.vertex);
+    return o;
+}
+~~~
+
+### 片元着色器
+
+即 frag函数， 确定片元的颜色
+
+### 常见的shader语言
+
+1. GLSL
+2. HLSL（推荐）
+3. CG（Unity中现在默认的）
+
+HLSL与CG语法相似， 某种意义上来说， CG是HLSL的变种， 所以， 掌握其中一种语言， 另一种语言的语法基本也就掌握了
